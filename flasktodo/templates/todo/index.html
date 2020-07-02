@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block main %}
+
+<div class="section">
+    <div class="container">
+
+        <nav class="panel">
+            <p class="panel-heading">
+                Todos
+            </p>
+            <div class="panel-block">
+                <form action="{{ url_for('todo.create_todo') }}" method="post" class="container">
+                    <div class="field">
+                        <p class="control">
+                            <input name="title" class="input" type="text" placeholder="Enter new todo title">
+                        </p>
+                    </div>
+                    <div class="field">
+                        <p class="control">
+                            <input name="text" class="input" type="text" placeholder="Enter new todo description"></textarea>
+                        </p>
+                    </div>
+                    
+                    <p class="control">
+                        <button class="button is-link" type="submit">Add Todo</button>
+                    </p>
+                </form>
+            </div>
+            <p class="panel-tabs mt-5 mb-2">
+                <a class="px-5 {% if tab == 'active' %} is-active {% endif %}" href="{{ url_for('todo.index') }}?tab=active">Active</a>
+                <a class="px-5 {% if tab == 'completed' %} is-active {% endif %}" href="{{ url_for('todo.index') }}?tab=completed">Completed</a>
+                <a class="px-5 {% if tab == 'archived' %} is-active {% endif %}" href="{{ url_for('todo.index') }}?tab=archived">Archived</a>
+            </p>
+            
+            {% if todos %}
+                {% for todo in todos %}
+                <a class="panel-block py-4 description-title" data-todo="{{ todo.id }}">
+                    <span class="panel-icon">
+                    {% if tab == 'active' %}
+                    <i class="far fa-star"></i>
+                    {% elif tab == 'completed' %}
+                    <i class="fas fa-check-circle"></i>
+                    {% else %}
+                    <i class="fas fa-trash-alt"></i>
+                    {% endif %}
+                    </span>
+                    {{ todo.title }}
+                </a>
+                <div class="panel-block is-hidden todo-description" data-description="{{ todo.id }}">
+                    <div class="todo-description-container">
+                        <p class="my-3 mx-2">
+                            {{ todo.text }}
+                        </p>
+                        <div class="field is-grouped is-grouped-right">
+                            {% if tab == 'active' %}
+                            <div class="control">
+                                <form action="{{ url_for('todo.complete_todo', id=todo.id) }}" method="post">
+                                    <div class="control"><button class="button is-info is-small">Mark Complete</button></div>
+                                </form>
+                            </div>
+                            {% endif %}
+                            {% if tab != 'archived' %}
+                            <div class="control">
+                                <form action="{{ url_for('todo.archive_todo', id=todo.id) }}" method="post">
+                                    <div class="control"><button class="button is-warning is-small">Archive</button></div>
+                                </form>
+                            </div>
+                            {% endif %}
+                            {% if tab != 'active' %}
+                            <div class="control">
+                                <form action="{{ url_for('todo.delete_todo', id=todo.id) }}" method="post">
+                                    <div class="control"><button class="button is-danger is-small">Delete</button></div>
+                                </form>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                {% endfor %}
+            {% else %}
+                <div class="panel-block">
+                    No todo items available
+                </div>
+            {% endif %}
+            
+            
+
+        </nav>
+        
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block js %}
+<script src="{{ url_for('static', filename='todo.js') }}"></script>
+{% endblock %}
